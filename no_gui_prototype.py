@@ -2,10 +2,13 @@ import logging
 import time
 import re
 import sys
+from pathlib import Path
 
 import serial
 import serial.tools.list_ports
 
+
+Path("./logs").mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,12 +99,20 @@ class RFD():
 if __name__ == "__main__":
 
     while True:
-        rfd = RFD(input("Input your encryption key -> "))
-        logger.info("starting task, this could take a few seconds")
-        check = rfd.enter_command_mode() and rfd.check_commands_work()
-        enable_and_set = rfd.send_setting("ATS15=1") and rfd.send_encryption_key()
-        if enable_and_set:
-            logger.info("Encryption key set!")
-        else:
-            logger.info(f"command mode initialisation {'passed' if check else 'failed'}, the encyrption key was not set. Remove power from the RFD then try again")
-        del rfd
+        try:
+            rfd = RFD(input("Input your encryption key -> "))
+            logger.info("starting task, this could take a few seconds")
+            check = rfd.enter_command_mode() and rfd.check_commands_work()
+            enable_and_set = rfd.send_setting("ATS15=1") and rfd.send_encryption_key()
+            if enable_and_set:
+                logger.info("Encryption key set!")
+            else:
+                logger.info(f"command mode initialisation {'passed' if check else 'failed'}, the encyrption key was not set. Remove power from the RFD then try again")
+            del rfd
+        except KeyboardInterrupt:
+            print("stopped")
+            time.sleep(2)
+            raise Exception()
+        except Exception as e:
+            print("Error encountered:")
+            print(e)

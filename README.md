@@ -1,6 +1,12 @@
 # RFD Encryption key setter
 
-User experience:
+## build
+pip install pyserial
+pip install pyinstaller
+pyinstaller -F .\no_gui_prototype.py
+
+
+## User experience:
 - open GUI program (text box, COM port dropdown, text explaining function, go button, success/fail)
 - plug in RFD
 - (option to select COM port explicitly)
@@ -9,7 +15,7 @@ User experience:
 - Repeat
 
 
-technical:
+## technical:
 - poll COM ports
 - When a new device is plugged in select that one
 - display this port to user
