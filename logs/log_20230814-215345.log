@@ -1,0 +1,17 @@
+2023-08-14 21:53:49,312, [DEBUG], no_gui_prototype, READ OK
+
+2023-08-14 21:53:49,312, [DEBUG], no_gui_prototype, SEND ATI
+2023-08-14 21:53:50,317, [DEBUG], no_gui_prototype, READ ATI
+
+2023-08-14 21:53:50,321, [DEBUG], no_gui_prototype, READ RFD SiK 3.57 on RFD868X
+
+2023-08-14 21:53:50,321, [DEBUG], no_gui_prototype, SEND ATS15=1
+2023-08-14 21:53:51,327, [DEBUG], no_gui_prototype, READ ATS15=1
+
+2023-08-14 21:53:51,327, [DEBUG], no_gui_prototype, READ OK
+
+2023-08-14 21:53:51,332, [DEBUG], no_gui_prototype, SEND AT&E=00000000000000000000000000000000
+2023-08-14 21:53:52,334, [DEBUG], no_gui_prototype, READ AT&E=00000000000000000000000000000000
+
+2023-08-14 21:53:52,348, [DEBUG], no_gui_prototype, READ key len 16
+
