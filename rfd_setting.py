@@ -3,6 +3,7 @@ import time
 import re
 import sys
 from pathlib import Path
+import os
 
 import serial
 import serial.tools.list_ports
@@ -59,9 +60,9 @@ class RFD():
         self.send(f"AT&E={self.__key.ljust(32, '0')}")
         return True if self.read() == "key len 16" else False
 
-    def send_setting(self, setting):
+    def send_setting(self, setting_number: int, value:int):
         """ send a setting and check for OK response """
-        echo = self.send(setting)
+        echo = self.send(f"ATS{setting_number}={value}")
         confirmation = self.read()
         return True if echo and confirmation=="OK" else False
 
@@ -87,7 +88,7 @@ class RFD():
         cmdbytes = f"{cmd}\r\n".encode()
         logging.debug( "SEND "+ cmd)
         self.__ser.write(cmdbytes)
-        time.sleep(0.5)
+        time.sleep(0.1)
         return True if self.read() == cmd else False
     
     def __del__(self):
@@ -100,11 +101,46 @@ if __name__ == "__main__":
 
     while True:
         try:
-            rfd = RFD(input("Input your encryption key -> "))
-            logger.info("starting task, this could take a few seconds")
+            key = os.urandom(32).hex()
+            logger.info(f"your key for this pair is {key}")
+            rfd = RFD(key)
+            logger.info("doing settings change, this could take a few seconds")
             check = rfd.enter_command_mode() and rfd.check_commands_work()
-            enable_and_set = rfd.send_setting("ATS15=1") and rfd.send_encryption_key()
-            if enable_and_set:
+            # enable_and_set = rfd.send_setting(15,1) and rfd.send_encryption_key()
+            enable_and_set = [
+                rfd.send_setting(15, 1),
+                rfd.send_setting(1, 57),
+                rfd.send_setting(2,100),
+                rfd.send_setting(3, 25),
+                rfd.send_setting(4, 30),
+                rfd.send_setting(5, 0),
+                rfd.send_setting(6, 1),
+                rfd.send_setting(7, 0),
+                rfd.send_setting(8, 865000),
+                rfd.send_setting(9, 870000),
+                rfd.send_setting(10, 8),
+                rfd.send_setting(11, 100),
+                rfd.send_setting(12, 0),
+                rfd.send_setting(13, 0),
+                rfd.send_setting(14, 50),
+                rfd.send_setting(16, 0),
+                rfd.send_setting(17, 0),
+                rfd.send_setting(18, 0), # SBUS input (1)
+                rfd.send_setting(19, 0), # SBUS output (2)
+                rfd.send_setting(20, 0),
+                rfd.send_setting(21, 0), # EXTRA LED output
+                rfd.send_setting(22, 0),
+                rfd.send_setting(23, 0), # rate and frequency band (only for 915)
+                rfd.send_setting(24, 0),
+                rfd.send_setting(25, 0),
+                rfd.send_setting(25, 0),
+                rfd.send_setting(28, 50),
+                rfd.send_encryption_key(),
+            ]
+
+            logger.debug(enable_and_set)
+
+            if all(enable_and_set):
                 logger.info("Encryption key set!")
             else:
                 logger.info(f"command mode initialisation {'passed' if check else 'failed'}, the encyrption key was not set. Remove power from the RFD then try again")
