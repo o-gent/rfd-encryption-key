@@ -3,8 +3,8 @@
 ## build
 pip install pyserial
 pip install pyinstaller
-pyinstaller -F .\no_gui_prototype.py
 
+pyinstaller --noconfirm --onefile --windowed --icon logo.ico gui.pyw; pyarmor gen -O obfdist --pack dist/gui.exe gui.pyw
 
 ## User experience:
 - open GUI program (text box, COM port dropdown, text explaining function, go button, success/fail)

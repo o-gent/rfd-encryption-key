@@ -1,9 +1,11 @@
+from dataclasses import dataclass
 import logging
 import time
 import re
 import sys
 from pathlib import Path
 import os
+from typing import Dict
 
 import serial
 import serial.tools.list_ports
@@ -55,16 +57,20 @@ class RFD():
             oldports = ports
             time.sleep(0.5)
 
-    def send_encryption_key(self):
-        """ send the encryption key, pad to 32 integers or 16 hex """
-        self.send(f"AT&E={self.__key.ljust(32, '0')}")
-        return True if self.read() == "key len 16" else False
+    def send_encryption_key(self) -> bool:
+        """ send the encryption key, pad to 64 integers or 32 hex """
+        self.send(f"AT&E={self.__key.ljust(64, '0')}")
+        return True if self.read() == "key len 32" else False
 
-    def send_setting(self, setting_number: int, value:int):
+    def send_setting(self, setting_number: int, value:int) -> bool:
         """ send a setting and check for OK response """
         echo = self.send(f"ATS{setting_number}={value}")
         confirmation = self.read()
         return True if echo and confirmation=="OK" else False
+    
+    def send_setting_values(self, settings: dict[int, int]) -> list[bool]:
+        """ send a dictionary of settings """
+        return [self.send_setting(setting_id, settings[setting_id]) for setting_id in settings.keys()]
 
     def check_commands_work(self) -> bool:
         """ sanity check that commands are working """
@@ -95,6 +101,32 @@ class RFD():
         if self.__ser_open:
             logger.info("closing serial port")
             self.__ser.close()
+
+@dataclass
+class RFD_SETTINGS:
+    serial_speed = 1
+    air_speed = 2
+    netid = 3
+    txpower = 4
+    ecc = 5
+    mavlink = 6
+    op_resend = 7
+    min_freq = 8
+    max_freq = 9
+    num_channels = 10
+    duty_cycle = 11
+    lbt_rssi = 12
+    rtscts = 13
+    max_window = 14
+    encryption_level = 15
+    rc_input = 16
+    rc_ouput = 17
+    sbus_input = 18
+    sbus_ouput = 19
+    ant_mode = 20
+    status_led = 21
+    rate_and_frequency_band = 23
+    frameloss = 28
 
 
 if __name__ == "__main__":
